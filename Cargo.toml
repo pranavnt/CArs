@@ -6,5 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-piston_window = "0.120.0"
+image = "0.24.7"
+piston_window = "0.129.0"
 rand = "0.8.4"
