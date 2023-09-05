@@ -1,13 +1,24 @@
 mod conway;
-mod lib;
 
+extern crate rand;
+
+use pulsar::{Board, Cell};
 
 fn main() {
-    let mut conway_board = lib::Board::new(100, Box::new(conway::ConwayRule {}));
+    let mut conway_board = Board::new(20, Box::new(conway::ConwayRule {}));
 
     // initialize the board
-    conway_board.set(50, 50, lib::Cell::Alive);
-    conway_board.set(51, 50, lib::Cell::Alive);
+    for i in 0..20 {
+        for j in 0..20 {
+            // 50% chance of being alive
+            if rand::random() {
+                conway_board.set(i, j, Cell::Alive);
+            }
+        }
+    }
+
+    // take a snapshot of the initial state
+    conway_board.snapshot();
 
     // run the simulation
     for _ in 0..1000 {
@@ -15,5 +26,5 @@ fn main() {
     }
 
     // render the video
-    conway_board.render("./videos/conway.mp4");
+    conway_board.render("./videos");
 }
