@@ -6,7 +6,6 @@ use std::path::Path;
 use std::process::Command;
 
 pub struct Board {
-    pub size: usize,
     pub grid: HashSet<(usize, usize)>,
     pub frames: Vec<HashSet<(usize, usize)>>,
     pub rule: Box<dyn Rule>,
@@ -23,7 +22,7 @@ pub trait Rule {
 }
 
 impl Board {
-    pub fn new(size: usize, rule: Box<dyn Rule>) -> Board {
+    pub fn new(rule: Box<dyn Rule>) -> Board {
         Board {
             grid: HashSet::new(),
             frames: Vec::new(),
@@ -54,7 +53,7 @@ impl Board {
     pub fn render(&self, dir_name: &str) {
         let mut i = 0;
         for frame in &self.frames {
-            let img_size = (10 * self.size) as u32;
+            let img_size = (10 * 100) as u32;
             let mut img: RgbImage = ImageBuffer::new(img_size, img_size);
 
             // Initialize the image as black (all cells dead)
