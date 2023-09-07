@@ -1,14 +1,14 @@
 extern crate image;
 
-
 use image::{ImageBuffer, Rgb, RgbImage};
+use std::collections::HashSet;
 use std::path::Path;
 use std::process::Command;
 
 pub struct Board {
     pub size: usize,
-    pub grid: Vec<Cell>,
-    pub frames: Vec<Vec<Cell>>,
+    pub grid: HashSet<(usize, usize)>,
+    pub frames: Vec<HashSet<(usize, usize)>>,
     pub rule: Box<dyn Rule>,
 }
 
@@ -19,15 +19,14 @@ pub enum Cell {
 }
 
 pub trait Rule {
-    fn apply(&mut self, state: &Vec<Cell>) -> Vec<Cell>;
+    fn apply(&self, state: &HashSet<(usize, usize)>) -> HashSet<(usize, usize)>;
 }
 
 impl Board {
     pub fn new(size: usize, rule: Box<dyn Rule>) -> Board {
         Board {
-            size,
-            grid: vec![Cell::Dead; size * size],
-            frames: Vec::<Vec<Cell>>::new(),
+            grid: HashSet::new(),
+            frames: Vec::new(),
             rule,
         }
     }
@@ -37,26 +36,45 @@ impl Board {
     }
 
     pub fn set(&mut self, x: usize, y: usize, value: Cell) {
-        self.grid[x * self.size + y] = value;
+        match value {
+            Cell::Alive => {
+                self.grid.insert((x, y));
+            }
+            Cell::Dead => {
+                self.grid.remove(&(x, y));
+            }
+        }
     }
 
     pub fn tick(&mut self) {
         self.grid = self.rule.apply(&self.grid);
-        self.frames.push(self.grid.clone());
+        self.snapshot();
     }
 
     pub fn render(&self, dir_name: &str) {
         let mut i = 0;
         for frame in &self.frames {
-            let mut img: RgbImage = ImageBuffer::new((10 * self.size) as u32,  (10 * self.size) as u32);
+            let img_size = (10 * self.size) as u32;
+            let mut img: RgbImage = ImageBuffer::new(img_size, img_size);
 
-            for (x, y, pixel) in img.enumerate_pixels_mut() {
-                let cell = frame[(x / 10 * self.size as u32 + y / 10) as usize];
-                let color = match cell {
-                    Cell::Alive => Rgb([255, 255, 255]),
-                    Cell::Dead => Rgb([0, 0, 0]),
-                };
-                *pixel = color;
+            // Initialize the image as black (all cells dead)
+            for (_, _, pixel) in img.enumerate_pixels_mut() {
+                *pixel = Rgb([0, 0, 0]);
+            }
+
+            // Set alive cells to white
+            // Set alive cells to white
+            for &(x, y) in frame.iter() {
+                for dx in 0..10 {
+                    for dy in 0..10 {
+                        let pixel_x = (x * 10 + dx) as u32;
+                        let pixel_y = (y * 10 + dy) as u32;
+                        if pixel_x < img_size && pixel_y < img_size {
+                            let pixel = img.get_pixel_mut(pixel_x, pixel_y);
+                            *pixel = Rgb([255, 255, 255]);
+                        }
+                    }
+                }
             }
 
             let path = Path::new(dir_name)
@@ -64,7 +82,6 @@ impl Board {
                 .with_extension("png");
 
             img.save(path).unwrap();
-
             i += 1;
         }
 

@@ -1,45 +1,61 @@
-use pulsar::{Cell, Rule};
+use pulsar::{Board, Cell, Rule};
+use std::collections::HashSet;
 
-#[derive(Clone)]
 pub struct ConwayRule {}
 
 impl Rule for ConwayRule {
-    fn apply(&mut self, grid: &Vec<Cell>) -> Vec<Cell> {
-        let mut new_grid = grid.clone();
+    fn apply(&self, grid: &HashSet<(usize, usize)>) -> HashSet<(usize, usize)> {
+        let mut new_grid = HashSet::new();
+        let mut candidates = HashSet::new();
 
-        for (pos, cell) in grid.iter().enumerate() {
-            let grid_len = (grid.len() as f64).sqrt() as usize;
-            let x: usize = pos % grid_len;
-            let y: usize = pos / grid_len;
-            let mut alive_neighbors = 0;
-            for i in -1..=1 {
-                for j in -1..=1 {
-                    if i == 0 && j == 0 {
+        // Build the set of candidates for state change (all alive cells and their neighbors)
+        for &(x, y) in grid.iter() {
+            candidates.insert((x, y));
+            for dx in -1..=1 {
+                for dy in -1..=1 {
+                    if dx == 0 && dy == 0 {
                         continue;
                     }
-                    let x = (x as i32 + i) as usize;
-                    let y = (y as i32 + j) as usize;
-                    if x >= grid_len || y >= grid_len {
-                        continue;
-                    }
-                    if grid[x * grid_len + y] == Cell::Alive {
-                        alive_neighbors += 1;
-                    }
-                }
-            }
-            match cell {
-                Cell::Alive => {
-                    if alive_neighbors < 2 || alive_neighbors > 3 {
-                        new_grid[pos] = Cell::Dead;
-                    }
-                }
-                Cell::Dead => {
-                    if alive_neighbors == 3 {
-                        new_grid[pos] = Cell::Alive;
+                    let nx = x as isize + dx;
+                    let ny = y as isize + dy;
+
+                    if nx >= 0 && ny >= 0 {
+                        candidates.insert((nx as usize, ny as usize));
                     }
                 }
             }
         }
+
+        // Evaluate each candidate for the next state
+        for &(x, y) in candidates.iter() {
+            let mut alive_neighbors = 0;
+            for dx in -1..=1 {
+                for dy in -1..=1 {
+                    if dx == 0 && dy == 0 {
+                        continue;
+                    }
+                    let nx = x as isize + dx;
+                    let ny = y as isize + dy;
+
+                    if nx >= 0 && ny >= 0 {
+                        if grid.contains(&(nx as usize, ny as usize)) {
+                            alive_neighbors += 1;
+                        }
+                    }
+                }
+            }
+
+            if grid.contains(&(x, y)) {
+                if alive_neighbors == 2 || alive_neighbors == 3 {
+                    new_grid.insert((x, y));
+                }
+            } else {
+                if alive_neighbors == 3 {
+                    new_grid.insert((x, y));
+                }
+            }
+        }
+
         new_grid
     }
 }
