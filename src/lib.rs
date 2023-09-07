@@ -1,6 +1,5 @@
 extern crate image;
-extern crate piston_window;
-use rayon::prelude::*;
+
 
 use image::{ImageBuffer, Rgb, RgbImage};
 use std::path::Path;
