@@ -1,72 +1,60 @@
-// use pulsar::{Cell, Rule};
+use pulsar::{Cell, Rule};
+use std::collections::HashSet;
 
-// #[derive(Clone)]
-// pub struct Rule30 {
-//     curr_row: usize,
-// }
+pub struct Rule30 {
+    current_row: usize, // Add this field to keep track of the current row
+}
 
-// impl Rule30 {
-//     pub fn new() -> Rule30 {
-//         Rule30 { curr_row: 1 }
-//     }
-// }
+impl Rule30 {
+    pub fn new() -> Rule30 {
+        Rule30 {
+            current_row: 0, // Initialize current_row to 0
+        }
+    }
+}
 
-// impl Rule for Rule30 {
-//     fn apply(&mut self, grid: &Vec<Cell>) -> Vec<Cell> {
-//         let mut new_grid = grid.clone();
+impl Rule for Rule30 {
+    fn apply(&mut self, grid: &HashSet<(usize, usize)>) -> HashSet<(usize, usize)> {
+        let mut new_grid = grid.clone(); // Start with the existing grid
+        let mut candidates = HashSet::new();
 
-//         let grid_len = (grid.len() as f64).sqrt() as usize;
-//         for pos in self.curr_row..self.curr_row + grid_len {
-//             let col = pos % grid_len;
+        // Build the set of candidates for state change based on the current_row
+        for &(x, y) in grid.iter().filter(|&&(_, y)| y == self.current_row) {
+            candidates.insert(x);
+            if x > 0 {
+                candidates.insert(x - 1);
+            }
+            candidates.insert(x + 1);
+        }
 
-//             // get the top right, top middle, and top left cells
-//             // rule 30 mapping is:
-//             // 111	110	101	100	011	010	001	000
-//             // 0	0	0	1	1	1	1	0
+        // Evaluate each candidate for the next state
+        for &x in candidates.iter() {
+            let left = if x > 0 { grid.contains(&(x - 1, self.current_row)) } else { false };
+            let center = grid.contains(&(x, self.current_row));
+            let right = grid.contains(&(x + 1, self.current_row));
 
-//             let top_left: bool = if col == 0 || self.curr_row == 0 {
-//                 false
-//             } else {
-//                 grid[grid_len * (self.curr_row - 1) + col - 1] == Cell::Alive
-//             };
+            if rule_30_next_state(left, center, right) {
+                new_grid.insert((x, self.current_row + 1));
+            }
+        }
 
-//             let top_middle: bool = if self.curr_row == 0 {
-//                 false
-//             } else {
-//                 grid[grid_len * (self.curr_row - 1) + col] == Cell::Alive
-//             };
+        self.current_row += 1; // Increment current_row for the next iteration
 
-//             let top_right: bool = if col == grid_len - 1 || self.curr_row == 0 {
-//                 false
-//             } else {
-//                 grid[grid_len * (self.curr_row - 1) + col + 1] == Cell::Alive
-//             };
+        new_grid
+    }
+}
 
-//             // print coordinates where any of these are true
-//             if top_left || top_middle || top_right {
-//                 println!("({}, {})", col, self.curr_row);
-//             }
+// The same rule_30_next_state function as before
+fn rule_30_next_state(left: bool, center: bool, right: bool) -> bool {
+    match (left, center, right) {
+        (true, true, true) => false,
+        (true, true, false) => false,
+        (true, false, true) => false,
+        (true, false, false) => true,
+        (false, true, true) => true,
+        (false, true, false) => true,
+        (false, false, true) => true,
+        (false, false, false) => false,
+    }
+}
 
-//             if top_left && top_middle && top_right {
-//                 new_grid[pos] = Cell::Dead;
-//             } else if top_left && top_middle && !top_right {
-//                 new_grid[pos] = Cell::Dead;
-//             } else if top_left && !top_middle && top_right {
-//                 new_grid[pos] = Cell::Dead;
-//             } else if top_left && !top_middle && !top_right {
-//                 new_grid[pos] = Cell::Alive;
-//             } else if !top_left && top_middle && top_right {
-//                 new_grid[pos] = Cell::Alive;
-//             } else if !top_left && top_middle && !top_right {
-//                 new_grid[pos] = Cell::Alive;
-//             } else if !top_left && !top_middle && top_right {
-//                 new_grid[pos] = Cell::Alive;
-//             } else if !top_left && !top_middle && !top_right {
-//                 new_grid[pos] = Cell::Dead;
-//             }
-//         }
-//         self.curr_row += 1;
-
-//         new_grid
-//     }
-// }

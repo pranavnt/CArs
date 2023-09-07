@@ -18,8 +18,9 @@ pub enum Cell {
 }
 
 pub trait Rule {
-    fn apply(&self, state: &HashSet<(usize, usize)>) -> HashSet<(usize, usize)>;
+    fn apply(&mut self, state: &HashSet<(usize, usize)>) -> HashSet<(usize, usize)>;
 }
+
 
 impl Board {
     pub fn new(rule: Box<dyn Rule>) -> Board {
@@ -46,7 +47,7 @@ impl Board {
     }
 
     pub fn tick(&mut self) {
-        self.grid = self.rule.apply(&self.grid);
+        self.grid = self.rule.apply(&mut self.grid);
         self.snapshot();
     }
 
@@ -87,7 +88,7 @@ impl Board {
         let output_path = Path::new(dir_name).join("output.mp4");
         let _ = Command::new("ffmpeg")
             .arg("-framerate")
-            .arg("30".to_string())
+            .arg("10".to_string())
             .arg("-i")
             .arg(dir_name.to_owned() + "/%d.png")
             .arg("-c:v")

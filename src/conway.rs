@@ -4,7 +4,7 @@ use std::collections::HashSet;
 pub struct ConwayRule {}
 
 impl Rule for ConwayRule {
-    fn apply(&self, grid: &HashSet<(usize, usize)>) -> HashSet<(usize, usize)> {
+    fn apply(&mut self, grid: &HashSet<(usize, usize)>) -> HashSet<(usize, usize)> {
         let mut new_grid = HashSet::new();
         let mut candidates = HashSet::new();
 
