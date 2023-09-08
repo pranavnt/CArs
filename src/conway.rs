@@ -1,4 +1,4 @@
-use pulsar::{Board, Cell, Rule};
+use cars::{Board, Cell, Rule};
 use std::collections::HashSet;
 
 pub struct ConwayRule {}

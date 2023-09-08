@@ -4,7 +4,7 @@ mod eca;
 
 extern crate rand;
 
-use pulsar::{Board, Cell};
+use cars::{Board, Cell};
 
 fn main() {
     // conway_test();

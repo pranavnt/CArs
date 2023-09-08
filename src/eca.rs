@@ -1,4 +1,4 @@
-use pulsar::{Cell, Rule};
+use cars::{Cell, Rule};
 use std::collections::HashSet;
 
 pub struct ElementaryRule {
