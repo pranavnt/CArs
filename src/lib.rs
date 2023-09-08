@@ -151,12 +151,12 @@ mod tests {
         }
 
         conway_board.snapshot();
-
+c
         for _ in 0..500 {
             conway_board.tick();
             println!("{:?}", conway_board.grid.len())
         }
 
-        conway_board.export("./videos/rule30");
+        conway_board.export("./videos/conway");
     }
 }
