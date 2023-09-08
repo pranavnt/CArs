@@ -1,4 +1,4 @@
-use cars::{Cell, Rule};
+use crate::Rule;
 use std::collections::HashSet;
 
 pub struct ElementaryRule {
@@ -20,7 +20,7 @@ impl Rule for ElementaryRule {
         let mut new_grid = grid.clone();
         let mut candidates = HashSet::new();
 
-        for &(x, y) in grid.iter().filter(|&&(_, y)| y == self.current_row) {
+        for &(x, _y) in grid.iter().filter(|&&(_, y)| y == self.current_row) {
             candidates.insert(x);
             if x > 0 {
                 candidates.insert(x - 1);
@@ -29,7 +29,11 @@ impl Rule for ElementaryRule {
         }
 
         for &x in candidates.iter() {
-            let left = if x > 0 { grid.contains(&(x - 1, self.current_row)) } else { false };
+            let left = if x > 0 {
+                grid.contains(&(x - 1, self.current_row))
+            } else {
+                false
+            };
             let center = grid.contains(&(x, self.current_row));
             let right = grid.contains(&(x + 1, self.current_row));
 

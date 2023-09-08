@@ -1,4 +1,11 @@
 extern crate image;
+extern crate rand;
+
+mod conway;
+mod eca;
+
+pub use conway::*;
+pub use eca::*;
 
 use image::{ImageBuffer, Rgb, RgbImage};
 use std::collections::HashSet;
@@ -20,7 +27,6 @@ pub enum Cell {
 pub trait Rule {
     fn apply(&mut self, state: &HashSet<(usize, usize)>) -> HashSet<(usize, usize)>;
 }
-
 
 impl Board {
     pub fn new(rule: Box<dyn Rule>) -> Board {
@@ -106,5 +112,51 @@ impl Board {
             .arg(output_path)
             .output()
             .unwrap();
+    }
+
+    pub fn render() {
+        // launch wasm? window that allows one to browse the frames and scroll through an infinite grid
+        unimplemented!("Implement me!");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn rule30_test() {
+        use crate::{eca, Board, Cell};
+        let mut rule30_board = Board::new(Box::new(eca::ElementaryRule::new(30)));
+        rule30_board.set(50, 0, Cell::Alive);
+        rule30_board.snapshot();
+
+        for _ in 0..200 {
+            rule30_board.tick();
+        }
+
+        rule30_board.export("./videos/eca/30");
+    }
+
+    #[test]
+    fn conway_test() {
+        use crate::{conway, Board, Cell};
+        let mut conway_board = Board::new(Box::new(conway::ConwayRule {}));
+
+        for i in 40..60 {
+            for j in 40..60 {
+                // 50% chance of being alive
+                if rand::random() {
+                    conway_board.set(i, j, Cell::Alive);
+                }
+            }
+        }
+
+        conway_board.snapshot();
+
+        for _ in 0..500 {
+            conway_board.tick();
+            println!("{:?}", conway_board.grid.len())
+        }
+
+        conway_board.export("./videos/rule30");
     }
 }

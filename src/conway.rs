@@ -1,4 +1,4 @@
-use cars::{Board, Cell, Rule};
+use crate::Rule;
 use std::collections::HashSet;
 
 pub struct ConwayRule {}
