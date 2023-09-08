@@ -1,6 +1,6 @@
 mod conway;
 mod gui;
-mod rule30;
+mod eca;
 
 extern crate rand;
 
@@ -12,7 +12,7 @@ fn main() {
 }
 
 fn rule30_test() {
-    let mut rule30_board = Board::new(Box::new(rule30::Rule30::new()));
+    let mut rule30_board = Board::new(Box::new(eca::ElementaryRule::new(30)));
     rule30_board.set(50, 0, Cell::Alive);
     rule30_board.snapshot();
 
@@ -20,7 +20,7 @@ fn rule30_test() {
         rule30_board.tick();
     }
 
-    rule30_board.render("./videos/rule30");
+    rule30_board.export("./videos/eca/30");
 }
 
 fn conway_test() {
@@ -42,5 +42,5 @@ fn conway_test() {
         println!("{:?}", conway_board.grid.len())
     }
 
-    conway_board.render("./videos/rule30");
+    conway_board.export("./videos/rule30");
 }

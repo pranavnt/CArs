@@ -51,7 +51,7 @@ impl Board {
         self.snapshot();
     }
 
-    pub fn render(&self, dir_name: &str) {
+    pub fn export(&self, dir_name: &str) {
         let mut i = 0;
         for frame in &self.frames {
             let img_size = (10 * 100) as u32;
