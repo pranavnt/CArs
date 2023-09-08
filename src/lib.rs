@@ -1,8 +1,8 @@
 extern crate image;
 extern crate rand;
 
-mod conway;
-mod eca;
+pub mod conway;
+pub mod eca;
 
 pub use conway::*;
 pub use eca::*;
