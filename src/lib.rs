@@ -151,8 +151,9 @@ mod tests {
         }
 
         conway_board.snapshot();
-c
+        
         for _ in 0..500 {
+            
             conway_board.tick();
             println!("{:?}", conway_board.grid.len())
         }
